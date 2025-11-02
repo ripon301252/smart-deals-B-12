@@ -14,6 +14,8 @@ app.use(express.json());
 // smartdbUser
 
 const uri = "mongodb+srv://smartdbUser:Tiq5E5rt151ktONs@cluster0.w0nmtjl.mongodb.net/?appName=Cluster0";
+// const uri = "mongodb://localhost:27017";
+
 
 const client = new MongoClient(uri, {
   serverApi: {
@@ -35,11 +37,58 @@ async function run() {
     await client.connect();
 
     const db = client.db('smart_db');
-    const productsCollection = db.collection('products')
+    const productsCollection = db.collection('products');
+    const bidsCollection = db.collection('bids');
+    const userCollection = db.collection('users');
+
+    // create (send database)
+    app.post('/users', async(req, res)=>{
+      const newUser = req.body;
+
+      const email = await req.body.email;
+      const query = {email: email}
+      const existingUser = await userCollection.findOne(query)
+      if(existingUser){
+        res.send({message: 'user already exists. do not need to insert again'})
+      }
+      else{
+        const result = await userCollection.insertOne(newUser);
+        res.send(result);
+      }
+
+      // const result = await userCollection.insertOne(newUser);
+      // res.send(result);
+    })
 
 
     // All read 
     app.get('/products', async(req, res)=>{
+
+      // const projectField = { _id: 0, title: 1, price_min: 1, price_max: 1, image: 1, }
+      // const cursor = productsCollection.find().sort({price_min: -1}).skip(2).limit(2).project(projectField);
+
+        // my product
+      // console.log(req.query)
+      const email = req.query.email;
+      const query = {}
+      if(email){
+        query.email = email
+      }
+
+      const cursor = productsCollection.find(query);
+      const result = await cursor.toArray();
+      res.send(result)
+    })
+
+    // show only 6 product
+    app.get('/latest-products', async(req, res)=>{
+      const cursor = productsCollection.find().sort({created_at: -1}).limit(6);
+      const result = await cursor.toArray();
+      res.send(result)
+    })
+
+    // show All Products
+    app.get('/allProducts', async(req, res)=>{
       const cursor = productsCollection.find();
       const result = await cursor.toArray();
       res.send(result)
@@ -87,6 +136,22 @@ async function run() {
       const result = await productsCollection.deleteOne(query);
       res.send(result);
     })
+
+
+    // bids related apis
+    app.get('/bids', async(req, res)=>{
+
+      const email = req.query.email;
+      const query = {};
+      if(email){
+        query.buyer_email = email;
+      }
+
+      const cursor = bidsCollection.find(query);
+      const result = await cursor.toArray();
+      res.send(result)
+    })
+
 
     await client.db("admin").command({ ping: 1 });
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
