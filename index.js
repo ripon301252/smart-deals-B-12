@@ -1,5 +1,6 @@
 const express = require('express');
 const cors = require('cors');
+require('dotenv').config()
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const app = express();
 const port = process.env.PORT || 3000;
@@ -10,10 +11,7 @@ app.use(cors());
 app.use(express.json());
 
 
-// Tiq5E5rt151ktONs
-// smartdbUser
-
-const uri = "mongodb+srv://smartdbUser:Tiq5E5rt151ktONs@cluster0.w0nmtjl.mongodb.net/?appName=Cluster0";
+const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.w0nmtjl.mongodb.net/?appName=Cluster0`;
 // const uri = "mongodb://localhost:27017";
 
 
@@ -179,6 +177,13 @@ async function run() {
       res.send(result);
     })
 
+    // bid remove (delete)
+    app.delete('/bids/:id', async(req, res)=>{
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await bidsCollection.deleteOne(query);
+      res.send(result);
+    })
 
     await client.db("admin").command({ ping: 1 });
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
