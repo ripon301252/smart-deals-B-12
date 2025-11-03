@@ -66,10 +66,10 @@ const Navbar = () => {
                     <button className=' md:text-base text-sm text-white py-2 px-4 rounded-md  bg-gradient-to-r from-[#5633e4] to-[#8755ea]'>
                         {
                             user ?
-                            <button onClick={handleSignOut} className='flex items-center gap-1 cursor-pointer'>
+                            <Link onClick={handleSignOut} className='flex items-center gap-1 cursor-pointer'>
                                 <IoLogInOutline className='text-2xl rotate-180' />
                                 <span className='font-semibold'>Log Out</span>
-                            </button> 
+                            </Link> 
                             :
                             <Link to={`/login`} className='flex items-center gap-1 cursor-pointer'>
                                 <IoLogInOutline className='text-2xl ' />
