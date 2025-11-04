@@ -21,7 +21,7 @@ const MyBids = () => {
           setBids(data);
         });
     }
-  }, [user?.email]);
+  }, [user]);
 
   const handleRemoveBid = (_id) => {
     Swal.fire({
